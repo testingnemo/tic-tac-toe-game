@@ -1,0 +1,157 @@
+/* --- CUSTOMIZATION SECTION --- */
+:root {
+    --board-bg: #2c3e50;
+    --cell-bg: #34495e;
+    --line-color: #ecf0f1;
+    --player-x-color: #1abc9c;
+    --player-o-color: #f1c40f;
+    --main-font: 'Montserrat', sans-serif;
+}
+/* --- END CUSTOMIZATION --- */
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: var(--main-font);
+    color: var(--line-color);
+    background: linear-gradient(-45deg, #0f62ac, #116bb5, #af0303);
+    background-size: 400% 400%;
+    animation: gradient 15s ease infinite;
+}
+
+@keyframes gradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.container {
+    text-align: center;
+}
+
+.hidden {
+    display: none;
+}
+
+h1 {
+    font-size: 2.2rem;
+    margin-bottom: 0.5em;
+    font-weight: 700;
+}
+
+p {
+    font-size: 1.1rem;
+}
+
+/* MODIFICATION: New style for the game status text */
+#status-text {
+    font-size: 1.9rem; /* Increased font size */
+    font-weight: bold;
+    height: 1.5em; /* Ensures consistent vertical space */
+    line-height: 1.5em;
+    width: 384px;  /* Matches the game board width (120*3 + 12*2) */
+    margin: 0 auto 20px auto; /* Centers the element and adds space below */
+}
+
+
+/* Menu Styles */
+.menu-buttons {
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.menu-button {
+    padding: 18px 36px;
+    font-size: 1.2em;
+    font-family: var(--main-font);
+    border: 2px solid var(--player-o-color);
+    border-radius: 10px;
+    background-color: transparent;
+    color: var(--player-o-color);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.menu-button:hover {
+    background-color: var(--player-o-color);
+    color: var(--board-bg);
+    box-shadow: 0 0 20px var(--player-o-color);
+}
+
+/* Game Board Styles */
+#game-board {
+    display: grid;
+    grid-template-columns: repeat(3, 120px);
+    grid-template-rows: repeat(3, 120px);
+    gap: 12px;
+    margin: 20px auto;
+}
+
+.cell {
+    width: 120px;
+    height: 120px;
+    background-color: var(--cell-bg);
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 4.5em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.cell.x {
+    color: var(--player-x-color);
+}
+
+.cell.o {
+    color: var(--player-o-color);
+}
+
+/* Back Button Style */
+#back-button {
+    margin-top: 25px;
+    padding: 12px 25px;
+    font-size: 1em;
+    font-family: var(--main-font);
+    border: none;
+    border-radius: 8px;
+    background-color: var(--player-x-color);
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#back-button:hover {
+     background-color: #16a085;
+}
+
+/* Team Credit Style */
+.team-credit {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    line-height: 1.4;
+}
+
+.team-credit strong {
+    font-size: 1.1rem;
+    color: #000000;
+    font-weight: bold;
+}
+
+.team-credit span {
+    font-size: 0.8rem;
+    color: rgba(236, 240, 241, 0.9);
+    display: block;
+}
