@@ -3,8 +3,8 @@
     --board-bg: #2c3e50;
     --cell-bg: #34495e;
     --line-color: #ecf0f1;
-    --player-x-color: #1abc9c;
-    --player-o-color: #f1c40f;
+    --player-x-color: #ffffff;
+    --player-o-color: #000000;
     --main-font: 'Montserrat', sans-serif;
 }
 /* --- END CUSTOMIZATION --- */
@@ -48,16 +48,14 @@ p {
     font-size: 1.1rem;
 }
 
-/* MODIFICATION: New style for the game status text */
 #status-text {
-    font-size: 1.9rem; /* Increased font size */
+    font-size: 1.9rem;
     font-weight: bold;
-    height: 1.5em; /* Ensures consistent vertical space */
+    height: 1.5em;
     line-height: 1.5em;
-    width: 384px;  /* Matches the game board width (120*3 + 12*2) */
-    margin: 0 auto 20px auto; /* Centers the element and adds space below */
+    width: 384px;
+    margin: 0 auto 20px auto;
 }
-
 
 /* Menu Styles */
 .menu-buttons {
@@ -116,8 +114,8 @@ p {
     color: var(--player-o-color);
 }
 
-/* Back Button Style */
-#back-button {
+/* Back Button Styles */
+#game-back-button, #difficulty-back-button {
     margin-top: 25px;
     padding: 12px 25px;
     font-size: 1em;
@@ -130,8 +128,8 @@ p {
     transition: background-color 0.3s;
 }
 
-#back-button:hover {
-     background-color: #16a085;
+#game-back-button:hover, #difficulty-back-button:hover {
+    background-color: #16a085;
 }
 
 /* Team Credit Style */
