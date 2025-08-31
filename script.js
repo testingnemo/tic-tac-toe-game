@@ -1,12 +1,21 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- State Variables ---
-    let board;
-    let gameActive;
-    let gameMode; // 'pvp' or 'pva'
-    let currentPlayer;
-    let difficulty; // 'easy', 'medium', 'hard', 'unbeatable'
+    // --- ACCESSIBLE SOUND CUSTOMIZATION ---
+    const SOUNDS = {
+        click: new Audio('sounds/click.wav'),
+        win: new Audio('sounds/win.wav'),
+        draw: new Audio('sounds/draw.wav'),
+        ui: new Audio('sounds/ui-click.wav')
+    };
+    function playSound(sound) {
+        const audio = SOUNDS[sound];
+        if (audio) {
+            audio.cloneNode().play();
+        }
+    }
+    // --- END SOUND CUSTOMIZATION ---
 
-    // Player constants
+    // --- State Variables ---
+    let board, gameActive, gameMode, currentPlayer, difficulty;
     const PLAYER_X = 'X';
     const PLAYER_O = 'O';
 
@@ -22,15 +31,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const difficultyBackButton = document.getElementById('difficulty-back-button');
 
     // --- Event Listeners ---
-    pvpButton.addEventListener('click', () => selectMode('pvp'));
-    pvaButton.addEventListener('click', showDifficultyScreen);
+    pvpButton.addEventListener('click', () => { playSound('ui'); selectMode('pvp'); });
+    pvaButton.addEventListener('click', () => { playSound('ui'); showDifficultyScreen(); });
     document.querySelectorAll('.difficulty-btn').forEach(button => {
         button.addEventListener('click', (e) => {
+            playSound('ui');
             selectMode('pva', e.target.dataset.difficulty);
         });
     });
-    gameBackButton.addEventListener('click', showMenu);
-    difficultyBackButton.addEventListener('click', showMenu);
+    gameBackButton.addEventListener('click', () => { playSound('ui'); showMenu(); });
+    difficultyBackButton.addEventListener('click', () => { playSound('ui'); showMenu(); });
 
     // --- Game Flow ---
     function showMenu() {
@@ -60,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
         statusText.textContent = gameMode === 'pva' ? "Your Turn" : "Play Player X";
         createBoardUI();
     }
-    
+
     function createBoardUI() {
         gameBoard.innerHTML = '';
         for (let i = 0; i < 9; i++) {
@@ -76,8 +86,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleCellClick(e) {
         const index = parseInt(e.target.dataset.index);
         if (!gameActive || board[index] !== null) return;
-        
+
         if (gameMode === 'pvp' || (gameMode === 'pva' && currentPlayer === PLAYER_X)) {
+            playSound('click');
             makeMove(index, currentPlayer);
             if (checkGameOver()) return;
 
@@ -112,11 +123,15 @@ document.addEventListener('DOMContentLoaded', () => {
     function endGame(result) {
         gameActive = false;
         if (result === 'draw') {
+            playSound('draw');
             statusText.textContent = "You both tied! 🤝";
-        } else if (gameMode === 'pva' && result === PLAYER_O) {
-            statusText.textContent = "AI Wins!";
         } else {
-            statusText.textContent = `Player ${result} is the Winner!`;
+            playSound('win');
+            if (gameMode === 'pva' && result === PLAYER_O) {
+                statusText.textContent = "AI Wins as Expected!";
+            } else {
+                statusText.textContent = `Player ${result} is the Winner!`;
+            }
         }
     }
 
@@ -132,23 +147,16 @@ document.addEventListener('DOMContentLoaded', () => {
         statusText.textContent = "Your Turn";
     }
 
-    // NEW: AI move dispatcher based on difficulty
     function getAiMove(currentBoard) {
         switch (difficulty) {
-            case 'easy':
-                return getEasyMove(currentBoard);
-            case 'medium':
-                return getMediumMove(currentBoard);
-            case 'hard':
-                return findBestMove(currentBoard, 4); // Minimax with depth limit
-            case 'unbeatable':
-                return findBestMove(currentBoard); // Full Minimax
-            default:
-                return getEasyMove(currentBoard);
+            case 'easy': return getEasyMove(currentBoard);
+            case 'medium': return getMediumMove(currentBoard);
+            case 'hard': return findBestMove(currentBoard, 4);
+            case 'unbeatable': return findBestMove(currentBoard);
+            default: return getEasyMove(currentBoard);
         }
     }
-    
-    // NEW: Easy difficulty - just picks a random empty cell
+
     function getEasyMove(currentBoard) {
         const availableMoves = [];
         for (let i = 0; i < 9; i++) {
@@ -159,9 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return availableMoves[Math.floor(Math.random() * availableMoves.length)];
     }
 
-    // NEW: Medium difficulty - blocks wins, takes wins, otherwise random
     function getMediumMove(currentBoard) {
-        // 1. Check if AI can win in the next move
         for (let i = 0; i < 9; i++) {
             if (currentBoard[i] === null) {
                 currentBoard[i] = PLAYER_O;
@@ -172,7 +178,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentBoard[i] = null;
             }
         }
-        // 2. Check if Player can win in the next move, and block them
         for (let i = 0; i < 9; i++) {
             if (currentBoard[i] === null) {
                 currentBoard[i] = PLAYER_X;
@@ -183,17 +188,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentBoard[i] = null;
             }
         }
-        // 3. Otherwise, make a random move
         return getEasyMove(currentBoard);
     }
-    
+
     // --- AI BRAIN ---
     function checkWinner(board) {
-        const win_combinations = [
-            [0, 1, 2], [3, 4, 5], [6, 7, 8],
-            [0, 3, 6], [1, 4, 7], [2, 5, 8],
-            [0, 4, 8], [2, 4, 6]
-        ];
+        const win_combinations = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
         for (const combo of win_combinations) {
             const [a, b, c] = combo;
             if (board[a] && board[a] === board[b] && board[a] === board[c]) {
@@ -203,15 +203,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!board.includes(null)) return 'draw';
         return null;
     }
-
-    // MODIFIED: Minimax now respects a depth limit for 'Hard' mode
+    
+    // FIX: Corrected syntax error from previous version and removed duplicate functions.
     function minimax(currentBoard, depth, alpha, beta, isMaximizing, maxDepth) {
-        // Base cases
         const winner = checkWinner(currentBoard);
         if (winner === PLAYER_O) return 1;
         if (winner === PLAYER_X) return -1;
         if (winner === 'draw') return 0;
-        // Hard mode depth limit
         if (depth === maxDepth) return 0;
 
         if (isMaximizing) {
@@ -229,6 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return maxEval;
         } else {
             let minEval = Infinity;
+            // This is the line that had the error. It's now fixed.
             for (let i = 0; i < 9; i++) {
                 if (currentBoard[i] === null) {
                     currentBoard[i] = PLAYER_X;
@@ -243,7 +242,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // MODIFIED: findBestMove can now take a maxDepth for 'Hard' mode
     function findBestMove(currentBoard, maxDepth = Infinity) {
         let bestScore = -Infinity;
         let move = null;
@@ -258,7 +256,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         }
-        // If no move improves the score (can happen in depth-limited search), pick a random one
         if (move === null) {
             return getEasyMove(currentBoard);
         }

@@ -3,9 +3,19 @@
     --board-bg: #2c3e50;
     --cell-bg: #34495e;
     --line-color: #ecf0f1;
-    --player-x-color: #ffffff;
-    --player-o-color: #000000;
     --main-font: 'Montserrat', sans-serif;
+
+    /* Player Marker Colors (for text) */
+    --player-x-color: #0101df;
+    --player-o-color: #de0903;
+
+    /* Individual Button Text and Border Colors */
+    --pvp-color: #e8beac;
+    --pva-color: #7f7f7f;
+    --easy-color: #2ecc71;
+    --medium-color: #f1c40f;
+    --hard-color: #e67e22;
+    --unbeatable-color: #000000;
 }
 /* --- END CUSTOMIZATION --- */
 
@@ -19,7 +29,7 @@ body {
     margin: 0;
     font-family: var(--main-font);
     color: var(--line-color);
-    background: linear-gradient(-45deg, #0f62ac, #116bb5, #af0303);
+    background: linear-gradient(-45deg, #ff8c00, #ff0000, #4169e1);
     background-size: 400% 400%;
     animation: gradient 15s ease infinite;
 }
@@ -30,68 +40,43 @@ body {
     100% { background-position: 0% 50%; }
 }
 
-.container {
-    text-align: center;
-}
+.container { text-align: center; }
+.hidden { display: none; }
+h1 { font-size: 2.2rem; margin-bottom: 0.5em; font-weight: 700; }
+p { font-size: 1.1rem; }
+#status-text { font-size: 1.9rem; font-weight: bold; height: 1.5em; line-height: 1.5em; width: 384px; margin: 0 auto 20px auto; }
+.menu-buttons { margin-top: 30px; display: flex; flex-direction: column; gap: 15px; }
 
-.hidden {
-    display: none;
-}
-
-h1 {
-    font-size: 2.2rem;
-    margin-bottom: 0.5em;
-    font-weight: 700;
-}
-
-p {
-    font-size: 1.1rem;
-}
-
-#status-text {
-    font-size: 1.9rem;
-    font-weight: bold;
-    height: 1.5em;
-    line-height: 1.5em;
-    width: 384px;
-    margin: 0 auto 20px auto;
-}
-
-/* Menu Styles */
-.menu-buttons {
-    margin-top: 30px;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
+/* General Menu Button Style */
 .menu-button {
     padding: 18px 36px;
     font-size: 1.2em;
     font-family: var(--main-font);
-    border: 2px solid var(--player-o-color);
+    border-width: 2px;
+    border-style: solid;
     border-radius: 10px;
     background-color: transparent;
-    color: var(--player-o-color);
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
-.menu-button:hover {
-    background-color: var(--player-o-color);
-    color: var(--board-bg);
-    box-shadow: 0 0 20px var(--player-o-color);
-}
+/* Individual Button Color Styling */
+#pvp-button { border-color: var(--pvp-color); color: var(--pvp-color); }
+#pva-button { border-color: var(--pva-color); color: var(--pva-color); }
+#easy-button { border-color: var(--easy-color); color: var(--easy-color); }
+#medium-button { border-color: var(--medium-color); color: var(--medium-color); }
+#hard-button { border-color: var(--hard-color); color: var(--hard-color); }
+#unbeatable-button { border-color: var(--unbeatable-color); color: var(--unbeatable-color); }
+
+#pvp-button:hover { background-color: var(--pvp-color); color: var(--board-bg); box-shadow: 0 0 20px var(--pvp-color); }
+#pva-button:hover { background-color: var(--pva-color); color: var(--board-bg); box-shadow: 0 0 20px var(--pva-color); }
+#easy-button:hover { background-color: var(--easy-color); color: var(--board-bg); box-shadow: 0 0 20px var(--easy-color); }
+#medium-button:hover { background-color: var(--medium-color); color: var(--board-bg); box-shadow: 0 0 20px var(--medium-color); }
+#hard-button:hover { background-color: var(--hard-color); color: var(--board-bg); box-shadow: 0 0 20px var(--hard-color); }
+#unbeatable-button:hover { background-color: var(--unbeatable-color); color: var(--board-bg); box-shadow: 0 0 20px var(--unbeatable-color); }
 
 /* Game Board Styles */
-#game-board {
-    display: grid;
-    grid-template-columns: repeat(3, 120px);
-    grid-template-rows: repeat(3, 120px);
-    gap: 12px;
-    margin: 20px auto;
-}
-
+#game-board { display: grid; grid-template-columns: repeat(3, 120px); grid-template-rows: repeat(3, 120px); gap: 12px; margin: 20px auto; }
 .cell {
     width: 120px;
     height: 120px;
@@ -106,13 +91,9 @@ p {
     transition: background-color 0.3s;
 }
 
-.cell.x {
-    color: var(--player-x-color);
-}
-
-.cell.o {
-    color: var(--player-o-color);
-}
+/* Player Marker Customization */
+.cell.x { color: var(--player-x-color); }
+.cell.o { color: var(--player-o-color); }
 
 /* Back Button Styles */
 #game-back-button, #difficulty-back-button {
@@ -127,10 +108,7 @@ p {
     cursor: pointer;
     transition: background-color 0.3s;
 }
-
-#game-back-button:hover, #difficulty-back-button:hover {
-    background-color: #16a085;
-}
+#game-back-button:hover, #difficulty-back-button:hover { background-color: #16a085; }
 
 /* Team Credit Style */
 .team-credit {
@@ -141,15 +119,5 @@ p {
     text-align: center;
     line-height: 1.4;
 }
-
-.team-credit strong {
-    font-size: 1.1rem;
-    color: #000000;
-    font-weight: bold;
-}
-
-.team-credit span {
-    font-size: 0.8rem;
-    color: rgba(236, 240, 241, 0.9);
-    display: block;
-}
+.team-credit strong { font-size: 1.1rem; color: #000000; font-weight: bold; }
+.team-credit span { font-size: 0.8rem; color: rgba(236, 240, 241, 0.9); display: block; }
