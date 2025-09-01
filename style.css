@@ -16,6 +16,14 @@
     --medium-color: #f1c40f;
     --hard-color: #e67e22;
     --unbeatable-color: #000000;
+    --grid-option-color: #9b59b6;
+    --fun-mode-cheater-color: #e74c3c;
+    --fun-mode-blind-color: #34495e;
+    --fun-mode-clock-color: #f39c12;
+    --fun-mode-unfair-color: #d35400;
+    --fun-mode-decay-color: #27ae60;
+    --fun-mode-portal-color: #8e44ad;
+    --fun-mode-sabotage-color: #c0392b;
 }
 /* --- END CUSTOMIZATION --- */
 
@@ -44,10 +52,10 @@ body {
 .hidden { display: none; }
 h1 { font-size: 2.2rem; margin-bottom: 0.5em; font-weight: 700; }
 p { font-size: 1.1rem; }
-#status-text { font-size: 1.9rem; font-weight: bold; height: 1.5em; line-height: 1.5em; width: 384px; margin: 0 auto 20px auto; }
+#status-text { font-size: 1.9rem; font-weight: bold; height: 1.5em; line-height: 1.5em; margin: 0 auto 20px auto; }
 .menu-buttons { margin-top: 30px; display: flex; flex-direction: column; gap: 15px; }
 
-/* General Menu Button Style */
+/* General Menu Button Style - Glows by default */
 .menu-button {
     padding: 18px 36px;
     font-size: 1.2em;
@@ -55,37 +63,87 @@ p { font-size: 1.1rem; }
     border-width: 2px;
     border-style: solid;
     border-radius: 10px;
-    background-color: transparent;
     cursor: pointer;
     transition: all 0.3s ease;
+    background-color: var(--button-color, var(--player-o-color));
+    color: var(--board-bg);
+    box-shadow: 0 0 20px var(--button-color, var(--player-o-color));
+    border-color: var(--button-color, var(--player-o-color));
+}
+
+/* On hover, the glow is removed */
+.menu-button:hover {
+    background-color: transparent;
+    color: var(--button-color, var(--player-o-color));
+    box-shadow: none;
 }
 
 /* Individual Button Color Styling */
-#pvp-button { border-color: var(--pvp-color); color: var(--pvp-color); }
-#pva-button { border-color: var(--pva-color); color: var(--pva-color); }
-#easy-button { border-color: var(--easy-color); color: var(--easy-color); }
-#medium-button { border-color: var(--medium-color); color: var(--medium-color); }
-#hard-button { border-color: var(--hard-color); color: var(--hard-color); }
-#unbeatable-button { border-color: var(--unbeatable-color); color: var(--unbeatable-color); }
+#pvp-button { --button-color: var(--pvp-color); }
+#pva-button { --button-color: var(--pva-color); }
+#easy-button { --button-color: var(--easy-color); }
+#medium-button { --button-color: var(--medium-color); }
+#hard-button { --button-color: var(--hard-color); }
+#unbeatable-button { --button-color: var(--unbeatable-color); }
+.grid-option-btn { --button-color: var(--grid-option-color); }
 
-#pvp-button:hover { background-color: var(--pvp-color); color: var(--board-bg); box-shadow: 0 0 20px var(--pvp-color); }
-#pva-button:hover { background-color: var(--pva-color); color: var(--board-bg); box-shadow: 0 0 20px var(--pva-color); }
-#easy-button:hover { background-color: var(--easy-color); color: var(--board-bg); box-shadow: 0 0 20px var(--easy-color); }
-#medium-button:hover { background-color: var(--medium-color); color: var(--board-bg); box-shadow: 0 0 20px var(--medium-color); }
-#hard-button:hover { background-color: var(--hard-color); color: var(--board-bg); box-shadow: 0 0 20px var(--hard-color); }
-#unbeatable-button:hover { background-color: var(--unbeatable-color); color: var(--board-bg); box-shadow: 0 0 20px var(--unbeatable-color); }
+/* Fun Modes Buttons */
+#cheater-button { --button-color: var(--fun-mode-cheater-color); }
+#blind-button { --button-color: var(--fun-mode-blind-color); }
+#clock-button { --button-color: var(--fun-mode-clock-color); }
+#unfair-button { --button-color: var(--fun-mode-unfair-color); }
+#decay-button { --button-color: var(--fun-mode-decay-color); }
+#portal-button { --button-color: var(--fun-mode-portal-color); }
+#sabotage-button { --button-color: var(--fun-mode-sabotage-color); }
 
-/* Game Board Styles */
-#game-board { display: grid; grid-template-columns: repeat(3, 120px); grid-template-rows: repeat(3, 120px); gap: 12px; margin: 20px auto; }
+/* Special Rainbow Gradient Button */
+#fun-modes-button {
+    background: linear-gradient(45deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
+    background-size: 200% 200%;
+    animation: gradient-button-glow 5s ease infinite;
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+}
+#fun-modes-button:hover {
+    background: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    border-image: linear-gradient(45deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3) 1;
+    border-width: 2px;
+    border-style: solid;
+    box-shadow: none;
+    animation: none;
+}
+@keyframes gradient-button-glow {
+    0% { background-position: 0% 50%; box-shadow: 0 0 20px rgba(255, 0, 0, 0.7); }
+    25% { background-position: 50% 50%; box-shadow: 0 0 20px rgba(255, 127, 0, 0.7); }
+    50% { background-position: 100% 50%; box-shadow: 0 0 20px rgba(0, 0, 255, 0.7); }
+    75% { background-position: 50% 50%; box-shadow: 0 0 20px rgba(148, 0, 211, 0.7); }
+    100% { background-position: 0% 50%; box-shadow: 0 0 20px rgba(255, 0, 0, 0.7); }
+}
+
+
+/* Grid & Fun Mode Section Styles */
+.grid-options { display: grid !important; grid-template-columns: repeat(4, 1fr); }
+.grid-options .menu-button { padding: 12px 6px; font-size: 1em; }
+
+/* Dynamic Game Board Styles */
+#game-board {
+    display: grid;
+    gap: 10px;
+    margin: 20px auto;
+    max-width: 90vw;
+    max-height: 80vh;
+    aspect-ratio: 1 / 1;
+}
 .cell {
-    width: 120px;
-    height: 120px;
     background-color: var(--cell-bg);
-    border-radius: 10px;
+    border-radius: 8px;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 4.5em;
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.3s;
@@ -96,7 +154,7 @@ p { font-size: 1.1rem; }
 .cell.o { color: var(--player-o-color); }
 
 /* Back Button Styles */
-#game-back-button, #difficulty-back-button {
+#game-back-button, #difficulty-back-button, #grid-back-button, #fun-modes-back-button {
     margin-top: 25px;
     padding: 12px 25px;
     font-size: 1em;
@@ -108,7 +166,7 @@ p { font-size: 1.1rem; }
     cursor: pointer;
     transition: background-color 0.3s;
 }
-#game-back-button:hover, #difficulty-back-button:hover { background-color: #16a085; }
+#game-back-button:hover, #difficulty-back-button:hover, #grid-back-button:hover, #fun-modes-back-button:hover { background-color: #16a085; }
 
 /* Team Credit Style */
 .team-credit {

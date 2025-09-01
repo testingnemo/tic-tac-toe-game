@@ -16,36 +16,64 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- State Variables ---
     let board, gameActive, gameMode, currentPlayer, difficulty;
+    let gridSize = 3;
+    let winLength = 3;
     const PLAYER_X = 'X';
     const PLAYER_O = 'O';
 
     // --- DOM Elements ---
     const menuScreen = document.getElementById('menu-screen');
     const difficultyScreen = document.getElementById('difficulty-screen');
+    const gridScreen = document.getElementById('grid-screen');
     const gameScreen = document.getElementById('game-screen');
+    // MODIFICATION: Added new screen
+    const funModesScreen = document.getElementById('fun-modes-screen');
+
     const statusText = document.getElementById('status-text');
     const gameBoard = document.getElementById('game-board');
     const pvpButton = document.getElementById('pvp-button');
     const pvaButton = document.getElementById('pva-button');
+    // MODIFICATION: Added new buttons
+    const funModesButton = document.getElementById('fun-modes-button');
     const gameBackButton = document.getElementById('game-back-button');
     const difficultyBackButton = document.getElementById('difficulty-back-button');
+    const gridBackButton = document.getElementById('grid-back-button');
+    const funModesBackButton = document.getElementById('fun-modes-back-button');
+
 
     // --- Event Listeners ---
-    pvpButton.addEventListener('click', () => { playSound('ui'); selectMode('pvp'); });
+    pvpButton.addEventListener('click', () => { playSound('ui'); showGridScreen(); });
     pvaButton.addEventListener('click', () => { playSound('ui'); showDifficultyScreen(); });
-    document.querySelectorAll('.difficulty-btn').forEach(button => {
+    // MODIFICATION: Added listener for new Fun Modes button
+    funModesButton.addEventListener('click', () => { playSound('ui'); showFunModesScreen(); });
+
+    document.querySelectorAll('#difficulty-screen .difficulty-btn').forEach(button => {
         button.addEventListener('click', (e) => {
             playSound('ui');
             selectMode('pva', e.target.dataset.difficulty);
         });
     });
+    // MODIFICATION: Changed selector to be more specific
+    document.querySelectorAll('#fun-modes-screen .menu-button').forEach(button => {
+        button.addEventListener('click', () => {
+            playSound('ui');
+            alert('This Fun Mode is coming soon!');
+        });
+    });
     gameBackButton.addEventListener('click', () => { playSound('ui'); showMenu(); });
     difficultyBackButton.addEventListener('click', () => { playSound('ui'); showMenu(); });
+    gridBackButton.addEventListener('click', () => { playSound('ui'); showMenu(); });
+    // MODIFICATION: Added listener for new back button
+    funModesBackButton.addEventListener('click', () => { playSound('ui'); showMenu(); });
+
 
     // --- Game Flow ---
     function showMenu() {
         gameScreen.classList.add('hidden');
         difficultyScreen.classList.add('hidden');
+        gridScreen.classList.add('hidden');
+        // MODIFICATION: Also hide fun modes screen
+        funModesScreen.classList.add('hidden');
         menuScreen.classList.remove('hidden');
     }
 
@@ -54,29 +82,55 @@ document.addEventListener('DOMContentLoaded', () => {
         difficultyScreen.classList.remove('hidden');
     }
 
-    function selectMode(mode, diff = null) {
+    function showGridScreen() {
+        menuScreen.classList.add('hidden');
+        gridScreen.classList.remove('hidden');
+        populateGridOptions();
+    }
+    
+    // MODIFICATION: New function to show the Fun Modes screen
+    function showFunModesScreen() {
+        menuScreen.classList.add('hidden');
+        funModesScreen.classList.remove('hidden');
+    }
+
+    function selectMode(mode, diff = null, size = 3, length = 3) {
         gameMode = mode;
         difficulty = diff;
-        difficultyScreen.classList.add('hidden');
+        gridSize = size;
+        winLength = length;
         menuScreen.classList.add('hidden');
+        difficultyScreen.classList.add('hidden');
+        gridScreen.classList.add('hidden');
+        funModesScreen.classList.add('hidden');
         gameScreen.classList.remove('hidden');
         startGame();
     }
 
     function startGame() {
-        board = Array(9).fill(null);
+        board = Array(gridSize * gridSize).fill(null);
         gameActive = true;
         currentPlayer = PLAYER_X;
-        statusText.textContent = gameMode === 'pva' ? "Your Turn" : "Play Player X";
+        statusText.textContent = gameMode === 'pva' ? "Your Turn" : `Play Player X`;
         createBoardUI();
     }
 
     function createBoardUI() {
         gameBoard.innerHTML = '';
-        for (let i = 0; i < 9; i++) {
+        const boardSizePx = Math.min(window.innerWidth * 0.9, window.innerHeight * 0.7, 600);
+        const cellSize = boardSizePx / gridSize;
+        const fontSize = cellSize * 0.6;
+
+        gameBoard.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
+        gameBoard.style.gridTemplateRows = `repeat(${gridSize}, 1fr)`;
+        gameBoard.style.width = `${boardSizePx}px`;
+        gameBoard.style.height = `${boardSizePx}px`;
+        
+        for (let i = 0; i < gridSize * gridSize; i++) {
             const cell = document.createElement('div');
             cell.classList.add('cell');
             cell.dataset.index = i;
+            cell.style.fontSize = `${fontSize}px`;
             cell.addEventListener('click', handleCellClick);
             gameBoard.appendChild(cell);
         }
@@ -86,7 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleCellClick(e) {
         const index = parseInt(e.target.dataset.index);
         if (!gameActive || board[index] !== null) return;
-
+        
         if (gameMode === 'pvp' || (gameMode === 'pva' && currentPlayer === PLAYER_X)) {
             playSound('click');
             makeMove(index, currentPlayer);
@@ -128,7 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             playSound('win');
             if (gameMode === 'pva' && result === PLAYER_O) {
-                statusText.textContent = "AI Wins as Expected!";
+                statusText.textContent = "AI Wins!";
             } else {
                 statusText.textContent = `Player ${result} is the Winner!`;
             }
@@ -138,9 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- AI-Specific Functions ---
     function aiMove() {
         const moveIndex = getAiMove(board);
-        if (moveIndex !== null) {
-            makeMove(moveIndex, PLAYER_O);
-        }
+        if (moveIndex !== null) { makeMove(moveIndex, PLAYER_O); }
         if (checkGameOver()) return;
         currentPlayer = PLAYER_X;
         gameActive = true;
@@ -159,10 +211,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function getEasyMove(currentBoard) {
         const availableMoves = [];
-        for (let i = 0; i < 9; i++) {
-            if (currentBoard[i] === null) {
-                availableMoves.push(i);
-            }
+        for (let i = 0; i < currentBoard.length; i++) {
+            if (currentBoard[i] === null) availableMoves.push(i);
         }
         return availableMoves[Math.floor(Math.random() * availableMoves.length)];
     }
@@ -171,47 +221,45 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let i = 0; i < 9; i++) {
             if (currentBoard[i] === null) {
                 currentBoard[i] = PLAYER_O;
-                if (checkWinner(currentBoard) === PLAYER_O) {
-                    currentBoard[i] = null;
-                    return i;
-                }
+                if (checkWinner3x3(currentBoard) === PLAYER_O) { currentBoard[i] = null; return i; }
                 currentBoard[i] = null;
             }
         }
         for (let i = 0; i < 9; i++) {
             if (currentBoard[i] === null) {
                 currentBoard[i] = PLAYER_X;
-                if (checkWinner(currentBoard) === PLAYER_X) {
-                    currentBoard[i] = null;
-                    return i;
-                }
+                if (checkWinner3x3(currentBoard) === PLAYER_X) { currentBoard[i] = null; return i; }
                 currentBoard[i] = null;
             }
         }
         return getEasyMove(currentBoard);
     }
 
-    // --- AI BRAIN ---
+    // --- Dynamic & AI Brain ---
     function checkWinner(board) {
-        const win_combinations = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
-        for (const combo of win_combinations) {
-            const [a, b, c] = combo;
-            if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-                return board[a];
+        const size = gridSize;
+        const length = winLength;
+        function get(r, c) { return board[r * size + c]; }
+        for (let r = 0; r < size; r++) {
+            for (let c = 0; c < size; c++) {
+                const player = get(r, c);
+                if (player === null) continue;
+                if (c + length <= size) { let win = true; for (let i = 1; i < length; i++) { if (get(r, c + i) !== player) { win = false; break; } } if (win) return player; }
+                if (r + length <= size) { let win = true; for (let i = 1; i < length; i++) { if (get(r + i, c) !== player) { win = false; break; } } if (win) return player; }
+                if (c + length <= size && r + length <= size) { let win = true; for (let i = 1; i < length; i++) { if (get(r + i, c + i) !== player) { win = false; break; } } if (win) return player; }
+                if (c - length + 1 >= 0 && r + length <= size) { let win = true; for (let i = 1; i < length; i++) { if (get(r + i, c - i) !== player) { win = false; break; } } if (win) return player; }
             }
         }
         if (!board.includes(null)) return 'draw';
         return null;
     }
     
-    // FIX: Corrected syntax error from previous version and removed duplicate functions.
     function minimax(currentBoard, depth, alpha, beta, isMaximizing, maxDepth) {
-        const winner = checkWinner(currentBoard);
-        if (winner === PLAYER_O) return 1;
-        if (winner === PLAYER_X) return -1;
-        if (winner === 'draw') return 0;
+        const winnerResult = checkWinner3x3(currentBoard);
+        if (winnerResult === PLAYER_O) return 1;
+        if (winnerResult === PLAYER_X) return -1;
+        if (winnerResult === 'draw') return 0;
         if (depth === maxDepth) return 0;
-
         if (isMaximizing) {
             let maxEval = -Infinity;
             for (let i = 0; i < 9; i++) {
@@ -227,7 +275,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return maxEval;
         } else {
             let minEval = Infinity;
-            // This is the line that had the error. It's now fixed.
             for (let i = 0; i < 9; i++) {
                 if (currentBoard[i] === null) {
                     currentBoard[i] = PLAYER_X;
@@ -241,7 +288,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return minEval;
         }
     }
-
+    
     function findBestMove(currentBoard, maxDepth = Infinity) {
         let bestScore = -Infinity;
         let move = null;
@@ -250,15 +297,38 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentBoard[i] = PLAYER_O;
                 let score = minimax(currentBoard, 0, -Infinity, Infinity, false, maxDepth);
                 currentBoard[i] = null;
-                if (score > bestScore) {
-                    bestScore = score;
-                    move = i;
-                }
+                if (score > bestScore) { bestScore = score; move = i; }
             }
         }
-        if (move === null) {
-            return getEasyMove(currentBoard);
+        return move !== null ? move : getEasyMove(currentBoard);
+    }
+    
+    const win_combinations_3x3 = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
+    function checkWinner3x3(board) {
+        for (const combo of win_combinations_3x3) {
+            const [a, b, c] = combo;
+            if (board[a] && board[a] === board[b] && board[a] === board[c]) { return board[a]; }
         }
-        return move;
+        if (!board.slice(0, 9).includes(null)) return 'draw';
+        return null;
+    }
+
+    function populateGridOptions() {
+        const gridOptionsContainer = document.querySelector('#grid-screen .menu-buttons');
+        gridOptionsContainer.innerHTML = '';
+        const options = [
+            { size: 2, length: 2 }, { size: 3, length: 3 }, { size: 4, length: 3 }, { size: 5, length: 4 },
+            { size: 6, length: 5 }, { size: 7, length: 6 }, { size: 8, length: 6 }, { size: 9, length: 6 }
+        ];
+        options.forEach(opt => {
+            const button = document.createElement('button');
+            button.classList.add('menu-button', 'grid-option-btn');
+            button.textContent = `${opt.size}x${opt.size} (${opt.length}-in-a-row)`;
+            button.onclick = () => {
+                playSound('ui');
+                selectMode('pvp', null, opt.size, opt.length);
+            };
+            gridOptionsContainer.appendChild(button);
+        });
     }
 });
